@@ -70,10 +70,10 @@ dependencies:
   open_file: 3.5.10
   app_installer: 1.3.1
   app_settings: 6.1.1
-  webdav_client_plus: 1.0.2
+  # webdav_client_plus: 1.0.2  # 已移除备份同步功能
   mime: 1.0.4
   http: 1.4.0
-  icloud_storage: 2.2.0 #https://github.com/lollipopkit/flutter_server_box/blob/d94b2a7805891da3e652a9a65cc0c774a2ec6db4/lib/core/utils/sync/icloud.dart#L32
+  # icloud_storage: 2.2.0  # 已移除备份同步功能
   archive: 4.0.7
   quick_actions: 1.1.0
   android_package_manager: #0.7.1

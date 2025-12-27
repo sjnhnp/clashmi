@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/modules/clash_setting_manager.dart';
 import 'package:clashmi/app/modules/profile_manager.dart';
-import 'package:clashmi/app/modules/profile_patch_manager.dart';
+// import 'package:clashmi/app/modules/profile_patch_manager.dart';  // 精简版：已移除补丁功能
 import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
 import 'package:clashmi/app/utils/app_args.dart';
@@ -147,19 +147,13 @@ class VPNService {
   }
 
   static Future<bool> _prepareConfig(ProfileSetting profile) async {
-    final currentPatch = ProfilePatchManager.getCurrent();
+    // 精简版：始终使用最小覆写模式，让用户配置直接传递给内核
     final setting = ClashSettingManager.getConfig();
     final appSetting = SettingManager.getConfig();
     final controlPort = ClashSettingManager.getControlPort();
 
-    bool overwrite = true;
-    if (profile.patch.isEmpty ||
-        !ProfilePatchManager.existProfilePatch(profile.patch)) {
-      overwrite = currentPatch.id.isEmpty ||
-          currentPatch.id == kProfilePatchBuildinOverwrite;
-    } else {
-      overwrite = profile.patch == kProfilePatchBuildinOverwrite;
-    }
+    // 始终使用最小覆写模式
+    const bool overwrite = false;
     await ClashSettingManager.saveCorePatchFinal(overwrite);
 
     var excludePorts = [
@@ -180,8 +174,8 @@ class VPNService {
     config.work_dir = PathUtils.appAssetsDir();
     config.cache_dir = await PathUtils.cacheDir();
     config.core_path = path.join(await PathUtils.profilesDir(), profile.id);
-    config.core_path_patch =
-        await ProfilePatchManager.getProfilePatchPath(profile.patch);
+    // 精简版：不使用补丁配置
+    config.core_path_patch = "";
     config.core_path_patch_final = await PathUtils.serviceCorePatchFinalPath();
     config.log_path = await PathUtils.serviceLogFilePath();
     config.err_path = await PathUtils.serviceStdErrorFilePath();
@@ -190,10 +184,8 @@ class VPNService {
     config.name = name;
     config.secret = await ClashHttpApi.getSecret();
     config.install_refer = installReferrer;
-    config.prepare = (overwrite &&
-            setting.Tun?.OverWrite == true &&
-            setting.Tun?.Enable == true) ||
-        !overwrite;
+    // 精简版：overwrite = false 时，prepare 始终为 true
+    config.prepare = true;
     config.wake_lock = appSetting.wakeLock;
     config.auto_connect_at_boot = appSetting.autoConnectAtBoot;
     var bundleIdentifier = AppUtils.getBundleId(_systemExtension);

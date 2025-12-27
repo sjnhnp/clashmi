@@ -3,10 +3,10 @@
 /// Source: lib/i18n
 /// To regenerate, run: `dart run slang`
 ///
-/// Locales: 5
-/// Strings: 1325 (265 per locale)
+/// Locales: 2
+/// Strings: 530 (265 per locale)
 ///
-/// Built on 2025-12-22 at 03:50 UTC
+/// Modified: 2025-12-27 - Simplified to only en and zh-CN
 
 // coverage:ignore-file
 // ignore_for_file: type=lint, unused_import
@@ -18,9 +18,6 @@ import 'package:slang/generated.dart';
 import 'package:slang_flutter/slang_flutter.dart';
 export 'package:slang_flutter/slang_flutter.dart';
 
-import 'strings_ar.g.dart' deferred as l_ar;
-import 'strings_fa.g.dart' deferred as l_fa;
-import 'strings_ru.g.dart' deferred as l_ru;
 import 'strings_zh_CN.g.dart' deferred as l_zh_CN;
 part 'strings_en.g.dart';
 
@@ -32,9 +29,6 @@ part 'strings_en.g.dart';
 /// - if (LocaleSettings.currentLocale == AppLocale.en) // locale check
 enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 	en(languageCode: 'en'),
-	ar(languageCode: 'ar'),
-	fa(languageCode: 'fa'),
-	ru(languageCode: 'ru'),
 	zhCn(languageCode: 'zh', countryCode: 'CN');
 
 	const AppLocale({
@@ -60,27 +54,6 @@ enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 					cardinalResolver: cardinalResolver,
 					ordinalResolver: ordinalResolver,
 				);
-			case AppLocale.ar:
-				await l_ar.loadLibrary();
-				return l_ar.TranslationsAr(
-					overrides: overrides,
-					cardinalResolver: cardinalResolver,
-					ordinalResolver: ordinalResolver,
-				);
-			case AppLocale.fa:
-				await l_fa.loadLibrary();
-				return l_fa.TranslationsFa(
-					overrides: overrides,
-					cardinalResolver: cardinalResolver,
-					ordinalResolver: ordinalResolver,
-				);
-			case AppLocale.ru:
-				await l_ru.loadLibrary();
-				return l_ru.TranslationsRu(
-					overrides: overrides,
-					cardinalResolver: cardinalResolver,
-					ordinalResolver: ordinalResolver,
-				);
 			case AppLocale.zhCn:
 				await l_zh_CN.loadLibrary();
 				return l_zh_CN.TranslationsZhCn(
@@ -100,24 +73,6 @@ enum AppLocale with BaseAppLocale<AppLocale, Translations> {
 		switch (this) {
 			case AppLocale.en:
 				return TranslationsEn(
-					overrides: overrides,
-					cardinalResolver: cardinalResolver,
-					ordinalResolver: ordinalResolver,
-				);
-			case AppLocale.ar:
-				return l_ar.TranslationsAr(
-					overrides: overrides,
-					cardinalResolver: cardinalResolver,
-					ordinalResolver: ordinalResolver,
-				);
-			case AppLocale.fa:
-				return l_fa.TranslationsFa(
-					overrides: overrides,
-					cardinalResolver: cardinalResolver,
-					ordinalResolver: ordinalResolver,
-				);
-			case AppLocale.ru:
-				return l_ru.TranslationsRu(
 					overrides: overrides,
 					cardinalResolver: cardinalResolver,
 					ordinalResolver: ordinalResolver,

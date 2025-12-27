@@ -9,20 +9,18 @@ import 'package:clashmi/app/local_services/vpn_service.dart';
 import 'package:clashmi/app/modules/auto_update_manager.dart';
 import 'package:clashmi/app/modules/clash_setting_manager.dart';
 import 'package:clashmi/app/modules/profile_manager.dart';
-import 'package:clashmi/app/modules/profile_patch_manager.dart';
+// import 'package:clashmi/app/modules/profile_patch_manager.dart';  // 精简版：已移除补丁功能
 import 'package:clashmi/app/modules/remote_config_manager.dart';
 import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/modules/zashboard.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
-import 'package:clashmi/app/utils/backup_and_sync_utils.dart';
+
 import 'package:clashmi/app/utils/file_utils.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:clashmi/app/utils/platform_utils.dart';
 import 'package:clashmi/app/utils/url_launcher_utils.dart';
 import 'package:clashmi/i18n/strings.g.dart';
-import 'package:clashmi/screens/backup_and_sync_icloud_screen.dart';
-import 'package:clashmi/screens/backup_and_sync_webdav_screen.dart';
-import 'package:clashmi/screens/backup_helper.dart';
+
 import 'package:clashmi/screens/dialog_utils.dart';
 import 'package:clashmi/screens/file_view_screen.dart';
 import 'package:clashmi/screens/group_item_creator.dart';
@@ -31,7 +29,7 @@ import 'package:clashmi/screens/group_screen.dart';
 import 'package:clashmi/screens/language_settings_screen.dart';
 import 'package:clashmi/screens/list_add_screen.dart';
 import 'package:clashmi/screens/perapp_android_screen.dart';
-import 'package:clashmi/screens/profiles_patch_board_screen.dart';
+// import 'package:clashmi/screens/profiles_patch_board_screen.dart';  // 精简版：已移除补丁功能
 import 'package:clashmi/screens/theme_define.dart';
 import 'package:clashmi/screens/themes.dart';
 import 'package:clashmi/screens/version_update_screen.dart';
@@ -77,156 +75,31 @@ class GroupHelper {
   }
 
   static Future<void> showBackupAndSync(BuildContext context) async {
-    Future<List<GroupItem>> getOptions(
-        BuildContext context, SetStateCallback? setstate) async {
-      final tcontext = Translations.of(context);
-
-      List<GroupItemOptions> options = [
-        if (Platform.isIOS || Platform.isMacOS) ...[
-          GroupItemOptions(
-              pushOptions: GroupItemPushOptions(
-                  name: tcontext.meta.iCloud,
-                  onPush: () async {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            settings: BackupAndSyncIcloudScreen.routSettings(),
-                            builder: (context) =>
-                                const BackupAndSyncIcloudScreen()));
-                  }))
-        ],
-        GroupItemOptions(
-            pushOptions: GroupItemPushOptions(
-                name: tcontext.meta.webdav,
-                onPush: () async {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          settings: BackupAndSyncWebdavScreen.routSettings(),
-                          builder: (context) =>
-                              const BackupAndSyncWebdavScreen()));
-                })),
-        GroupItemOptions(
-            pushOptions: GroupItemPushOptions(
-                name: tcontext.meta.importAndExport,
-                onPush: () async {
-                  onTapImportExport(context);
-                }))
-      ];
-
-      return [
-        GroupItem(options: options),
-      ];
-    }
-
-    final tcontext = Translations.of(context);
-    await Navigator.push(
-        context,
-        MaterialPageRoute(
-            settings: GroupScreen.routSettings("backupAndSync"),
-            builder: (context) => GroupScreen(
-                  title: tcontext.meta.backupAndSync,
-                  getOptions: getOptions,
-                )));
+    // 简化版：直接调用导入导出页面
+    await onTapImportExport(context);
     SettingManager.save();
   }
 
   static Future<void> onTapImportExport(BuildContext context) async {
+    // 功能已移除
     final tcontext = Translations.of(context);
-
-    Future<List<GroupItem>> getOptions(
-        BuildContext context, SetStateCallback? setstate) async {
-      List<GroupItemOptions> options = [
-        GroupItemOptions(
-            pushOptions: GroupItemPushOptions(
-                name: tcontext.meta.import,
-                onPush: () async {
-                  onTapImport(context);
-                })),
-        GroupItemOptions(
-            pushOptions: GroupItemPushOptions(
-                name: tcontext.meta.importFromUrl,
-                onPush: () async {
-                  onTapImportFromUrl(context);
-                })),
-        GroupItemOptions(
-            pushOptions: GroupItemPushOptions(
-                name: tcontext.meta.export,
-                onPush: () async {
-                  onTapExport(context);
-                })),
-      ];
-      return [GroupItem(options: options)];
-    }
-
-    if (!context.mounted) {
-      return;
-    }
-
-    await Navigator.push(
-        context,
-        MaterialPageRoute(
-            settings: GroupScreen.routSettings("importAndExport"),
-            builder: (context) => GroupScreen(
-                  title: tcontext.meta.importAndExport,
-                  getOptions: getOptions,
-                )));
+    DialogUtils.showAlertDialog(
+        context, tcontext.meta.featureRemoved ?? "Feature removed in simplified version");
   }
 
   static Future<void> onTapImport(BuildContext context) async {
-    final tcontext = Translations.of(context);
-    List<String> extensions = [BackupAndSyncUtils.getZipExtension()];
-    try {
-      FilePickerResult? pickResult = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: extensions,
-      );
-      if (!context.mounted) {
-        return;
-      }
-      if (pickResult != null) {
-        String filePath = pickResult.files.first.path!;
-        String ext = path.extension(filePath).replaceAll('.', '').toLowerCase();
-        if (!extensions.contains(ext)) {
-          DialogUtils.showAlertDialog(
-              context, tcontext.meta.fileTypeInvalid(p: ext));
-          return;
-        }
-        if (!context.mounted) {
-          return;
-        }
-        await BackupHelper.backupRestoreFromZip(context, filePath);
-      }
-    } catch (err, stacktrace) {
-      if (!context.mounted) {
-        return;
-      }
-      DialogUtils.showAlertDialog(context, err.toString(),
-          showCopy: true, showFAQ: true, withVersion: true);
-    }
+    // 功能已移除
+    await onTapImportExport(context);
   }
 
   static Future<void> onTapImportFromUrl(BuildContext context) async {
-    final tcontext = Translations.of(context);
-    String? text = await DialogUtils.showTextInputDialog(
-        context, tcontext.meta.url, "", null, null, null, (text) {
-      text = text.trim();
+    // 功能已移除
+    await onTapImportExport(context);
+  }
 
-      Uri? uri = Uri.tryParse(text);
-      if (uri == null || (!uri.isScheme("HTTP") && !uri.isScheme("HTTPS"))) {
-        DialogUtils.showAlertDialog(context, tcontext.meta.urlInvalid);
-        return false;
-      }
-
-      return true;
-    });
-
-    if (text != null) {
-      if (!context.mounted) {
-        return;
-      }
-      BackupHelper.restoreBackupFromUrl(context, text);
-    }
+  static Future<void> onTapExport(BuildContext context) async {
+    // 功能已移除
+    await onTapImportExport(context);
   }
 
   static Future<void> onTapPortableModeOn(BuildContext context) async {
@@ -287,65 +160,6 @@ class GroupHelper {
     }
     await VPNService.uninit();
     await ServicesBinding.instance.exitApplication(AppExitType.required);
-  }
-
-  static Future<void> onTapExport(BuildContext context) async {
-    try {
-      String? filePath;
-      if (PlatformUtils.isMobile()) {
-        String dir = await PathUtils.cacheDir();
-        filePath = path.join(dir, BackupAndSyncUtils.getZipFileName());
-      } else {
-        filePath = await FilePicker.platform.saveFile(
-          fileName: BackupAndSyncUtils.getZipFileName(),
-          lockParentWindow: true,
-        );
-      }
-
-      if (filePath != null) {
-        if (!context.mounted) {
-          return;
-        }
-        ReturnResultError? error =
-            await BackupHelper.backupToZip(context, filePath);
-        if (!context.mounted) {
-          FileUtils.deletePath(filePath);
-          return;
-        }
-        if (error != null) {
-          DialogUtils.showAlertDialog(context, error.message,
-              showCopy: true, showFAQ: true, withVersion: true);
-          return;
-        }
-        if (PlatformUtils.isMobile()) {
-          try {
-            final box = context.findRenderObject() as RenderBox?;
-            final rect =
-                box != null ? box.localToGlobal(Offset.zero) & box.size : null;
-            await SharePlus.instance.share(
-              ShareParams(
-                files: [
-                  XFile(filePath),
-                ],
-                sharePositionOrigin: rect,
-              ),
-            );
-          } catch (err) {
-            if (!context.mounted) {
-              return;
-            }
-            DialogUtils.showAlertDialog(context, err.toString(),
-                showCopy: true, showFAQ: true, withVersion: true);
-          }
-        }
-      }
-    } catch (err, stacktrace) {
-      if (!context.mounted) {
-        return;
-      }
-      DialogUtils.showAlertDialog(context, err.toString(),
-          showCopy: true, showFAQ: true, withVersion: true);
-    }
   }
 
   static Future<void> showHelp(BuildContext context) async {
@@ -747,8 +561,9 @@ class GroupHelper {
     final tcontext = Translations.of(context);
     Future<List<GroupItem>> getOptions(
         BuildContext context, SetStateCallback? setstate) async {
-      final currentPatch = ProfilePatchManager.getCurrent();
-      final remark = currentPatch.getShowName(context);
+      // 精简版：不再使用补丁功能
+      // final currentPatch = ProfilePatchManager.getCurrent();
+      // final remark = currentPatch.getShowName(context);
       var setting = ClashSettingManager.getConfig();
       var extensions = setting.Extension!;
       final logLevels = ClashLogLevel.toList();
@@ -780,7 +595,7 @@ class GroupHelper {
                 name: tcontext.meta.reset,
                 onPush: () async {
                   ClashSettingManager.reset();
-                  ProfilePatchManager.reset();
+                  // 精简版：移除 ProfilePatchManager.reset()
                 })),
       ];
 
@@ -1019,10 +834,8 @@ class GroupHelper {
                   title: tcontext.meta.settingCore,
                   getOptions: getOptions,
                   onDone: (context) async {
-                    final currentPatch = ProfilePatchManager.getCurrent();
-                    final content = await ClashSettingManager.getPatchContent(
-                        currentPatch.id.isEmpty ||
-                            currentPatch.id == kProfilePatchBuildinOverwrite);
+                    // 精简版：始终使用不覆写模式
+                    final content = await ClashSettingManager.getPatchContent(false);
                     if (!context.mounted) {
                       return false;
                     }
@@ -1041,7 +854,7 @@ class GroupHelper {
                   onDoneIcon: Icons.file_present,
                 )));
     ClashSettingManager.save();
-    ProfilePatchManager.save();
+    // 精简版：移除 ProfilePatchManager.save()
     ProfileManager.save();
   }
 

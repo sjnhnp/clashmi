@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/modules/profile_manager.dart';
-import 'package:clashmi/app/modules/profile_patch_manager.dart';
+// import 'package:clashmi/app/modules/profile_patch_manager.dart';  // 精简版：已移除补丁功能
 import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
 import 'package:clashmi/i18n/strings.g.dart';
@@ -35,15 +35,16 @@ class ProfilesBoardItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final tcontext = Translations.of(context);
     final settings = SettingManager.getConfig();
-    final patch = ProfilePatchManager.getProfilePatch(setting.patch);
-    String patchRemark = "";
-    if (setting.patch.isEmpty || patch == null || patch.id.isEmpty) {
-      final currentPatch = ProfilePatchManager.getCurrent();
-      patchRemark =
-          "${tcontext.profilePatchMode.currentSelected} [${currentPatch.getShowName(context)}]";
-    } else {
-      patchRemark = patch.getShowName(context);
-    }
+    // 精简版：不再显示补丁信息
+    // final patch = ProfilePatchManager.getProfilePatch(setting.patch);
+    // String patchRemark = "";
+    // if (setting.patch.isEmpty || patch == null || patch.id.isEmpty) {
+    //   final currentPatch = ProfilePatchManager.getCurrent();
+    //   patchRemark =
+    //       "${tcontext.profilePatchMode.currentSelected} [${currentPatch.getShowName(context)}]";
+    // } else {
+    //   patchRemark = patch.getShowName(context);
+    // }
 
     String tranffic = "";
     Tuple2<bool, String>? tranfficExpire;
@@ -101,15 +102,16 @@ class ProfilesBoardItem extends StatelessWidget {
                         color: selected ? ThemeDefine.kColorBlue : null),
                   ),
                 ),
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    patchRemark,
-                    style: TextStyle(
-                        color: selected ? ThemeDefine.kColorBlue : null,
-                        fontSize: 12),
-                  ),
-                ),
+                // 精简版：不再显示补丁信息
+                // Align(
+                //   alignment: AlignmentDirectional.centerStart,
+                //   child: Text(
+                //     patchRemark,
+                //     style: TextStyle(
+                //         color: selected ? ThemeDefine.kColorBlue : null,
+                //         fontSize: 12),
+                //   ),
+                // ),
                 Align(
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(

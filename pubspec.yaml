@@ -63,7 +63,7 @@ dependencies:
   crypto: 3.0.7
   cryptography: 2.9.0
   open_dir: 0.0.2+1 #pc only
-  path: 1.9.1 #flutter_test
+  path: any  # 让 Flutter SDK 自动解析版本
   characters: 1.4.0 #flutter_test
   win32_registry: 1.1.5 #flutter_test
   share_plus: 12.0.1
@@ -99,10 +99,10 @@ dependencies:
       ref: bf21977eaa4e6035b1d81e249f91525a74f86ffd
       path: packages/window_manager
   libclash_vpn_service:
-    path: ../libclash-vpn-service/
-    #git:
-      #url: https://github.com/KaringX/libclash-vpn-service.git
-      #ref: master
+    #path: ../libclash-vpn-service/
+    git:
+      url: https://github.com/KaringX/libclash-vpn-service.git
+      ref: master
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.3
